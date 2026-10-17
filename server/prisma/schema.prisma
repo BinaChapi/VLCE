@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Each top-level website area is stored as JSONB, preserving the existing nested bilingual structure.
+model ContentSection {
+  key        String   @id
+  data       Json
+  published  Boolean  @default(true)
+  updatedAt  DateTime @updatedAt
+  createdAt  DateTime @default(now())
+}

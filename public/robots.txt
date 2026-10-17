@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://village-of-light.vercel.app/sitemap.xml
