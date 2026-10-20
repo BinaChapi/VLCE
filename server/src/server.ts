@@ -351,15 +351,32 @@ app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   });
 });
 
-if (!Number.isInteger(port) || port < 1 || port > 65535)
+if (!Number.isInteger(port) || port < 1 || port > 65535) {
   throw new Error("PORT must be a valid port number");
-const server = app.listen(port, () =>
-  console.log(`VLCE API listening on http://localhost:${port}`),
-);
-const shutdown = () => {
-  server.close(() => {
-    void prisma.$disconnect().finally(() => process.exit(0));
-  });
-};
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);
+}
+
+async function startServer() {
+  try {
+    await prisma.$connect();
+
+    const server = app.listen(port, () => {
+      console.log(`VLCE API listening on http://localhost:${port}`);
+      console.log("Database connection established.");
+    });
+
+    const shutdown = () => {
+      server.close(() => {
+        void prisma.$disconnect().finally(() => process.exit(0));
+      });
+    };
+
+    process.once("SIGINT", shutdown);
+    process.once("SIGTERM", shutdown);
+  } catch (error) {
+    console.error("Failed to start VLCE API or connect to database:", error);
+    await prisma.$disconnect();
+    process.exitCode = 1;
+  }
+}
+
+void startServer();
