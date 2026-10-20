@@ -1,8 +1,6 @@
 import { useEffect } from 'react'
 import { useLanguage } from '../i18n/LanguageContext'
-
-/** Public base URL used for canonical links, sitemap and social previews. */
-export const SITE_URL = 'https://village-of-light.vercel.app'
+import { SITE_URL } from '../site'
 
 function upsertMeta(selector: string, attrs: Record<string, string>) {
   let el = document.head.querySelector<HTMLMetaElement>(selector)

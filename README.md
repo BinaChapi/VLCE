@@ -106,3 +106,16 @@ npm run build:api
 ```
 
 Before deploying, set all environment variables in your hosting provider, run Prisma generate/push as appropriate, seed the initial content, and configure CORS to your production frontend domain. Deploy the Express API as a separate Node service and point the Vite app's `VITE_API_BASE_URL` at the API base URL (for example `https://api.example.org/api/v1`). If the frontend and API are deployed on separate domains, add the exact frontend origin to `CORS_ORIGINS`.
+
+## SEO and deployment
+
+The production frontend build writes page-specific titles, descriptions, canonical URLs, Open Graph/Twitter previews, and JSON-LD into static HTML for `/`, `/about`, `/programs`, `/impact`, `/contact`, and `/donate`. It marks `/admin` as `noindex` and creates the matching `sitemap.xml` and `robots.txt`. The React SEO component updates metadata after the published CMS content loads; the static page metadata comes from the English defaults in `src/content.ts`, so rebuild and redeploy the frontend after editing SEO metadata in the CMS.
+
+After deploying:
+
+1. Open each public page directly and check **View page source** (not only the browser Elements panel). Confirm its `<title>`, description, canonical URL, social tags, and JSON-LD are present and specific to that page.
+2. Visit `https://YOUR_DOMAIN/robots.txt` and `https://YOUR_DOMAIN/sitemap.xml`. Confirm the sitemap URLs use your production domain and include only public pages.
+3. In Google Search Console, add and verify your domain property, then submit `https://YOUR_DOMAIN/sitemap.xml` under **Sitemaps**. Use **URL inspection** to request indexing for the home page and key routes. Indexing and rankings take time and are not guaranteed.
+4. If you use a custom domain instead of the current Vercel domain, update `SITE_URL` in `src/site.ts`, then rebuild and redeploy. Configure that domain as the production frontend origin in the API's `CORS_ORIGINS` as well.
+
+The public pages currently switch between English and Amharic at the same URL, so search engines receive one canonical URL per page rather than separate language URLs. For independently indexed language versions, add language-specific URLs before publishing `hreflang` links.
